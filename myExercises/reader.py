@@ -1,15 +1,28 @@
 import csv
 
-def read_csv_as_dicts(file_path: str, col_types: list):
-    with open(file_path) as f:
-        rows = csv.reader(f)
-        list_of_dictionaries = []
-        header = next(rows)
+def read_csv_as_dicts(filename, types):
+    '''
+    Read CSV data into a list of dictionaries with optional type conversion
+    '''
+    records = []
+    with open(filename) as file:
+        rows = csv.reader(file)
+        headers = next(rows)
         for row in rows:
-            record = { name:func(val) for name, func, val in zip(header, col_types, row) }
-            list_of_dictionaries.append(record)
-            
-    return list_of_dictionaries
-            
-rows = read_csv_as_dicts('../../Data/ctabus.csv', [str,str,str,int])
-print(len(rows), rows[0])
+            record = { name: func(val) 
+                       for name, func, val in zip(headers, types, row) }
+            records.append(record)
+    return records
+
+def read_csv_as_instances(filename, cls):
+    '''
+    Read CSV data into a list of instances
+    '''
+    records = []
+    with open(filename) as file:
+        rows = csv.reader(file)
+        headers = next(rows)
+        for row in rows:
+            record = cls.from_row(row)
+            records.append(record)
+    return records

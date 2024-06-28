@@ -35,6 +35,3 @@ def print_portfolio(portfolio = list) -> None:
     for s in portfolio:
         print('%10s %10d %10.2f' % (s.name, s.shares, s.price))
         
-            
-list_of_stocks = read_portfolio('../../Data/portfolio.csv')
-print_portfolio(list_of_stocks)
