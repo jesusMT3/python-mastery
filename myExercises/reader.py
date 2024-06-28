@@ -1,28 +1,60 @@
 import csv
 
-def read_csv_as_dicts(filename, types):
+def read_csv_as_dicts(filename: str, types: list) -> list[dict]:
     '''
     Read CSV data into a list of dictionaries with optional type conversion
     '''
     records = []
     with open(filename) as file:
         rows = csv.reader(file)
-        headers = next(rows)
-        for row in rows:
-            record = { name: func(val) 
-                       for name, func, val in zip(headers, types, row) }
-            records.append(record)
+        records = csv_as_dicts(rows, types)
     return records
 
-def read_csv_as_instances(filename, cls):
+def csv_as_dicts(lines: list, types: list, header: list = None) -> list[dict]:
+    '''
+    Read lines and convert them to a list of dictionaries
+    '''
+    dictionary_list = []
+    if header is None:
+        headers = next(lines)
+    else:
+        headers = header
+    for line in lines:
+        line_dict = { name: func(val) 
+                    for name, func, val in zip(headers, types, line)}
+        dictionary_list.append(line_dict)
+    return dictionary_list
+
+def read_csv_as_instances(filename: str, cls: any) -> list[any]:
     '''
     Read CSV data into a list of instances
     '''
     records = []
     with open(filename) as file:
         rows = csv.reader(file)
-        headers = next(rows)
-        for row in rows:
-            record = cls.from_row(row)
-            records.append(record)
+        records = csv_as_instances(rows, cls)
     return records
+
+def csv_as_instances(lines: list, cls: any, header: list = None) -> list[any]:
+    '''
+    Read lines and convert to list of instances
+    '''
+    instances_list = []
+    if header is None:
+        headers = next(lines)
+    else:
+        headers = header
+
+    for line in lines:
+        instance = cls.from_row(line)
+        instances_list.append(instance)
+    return instances_list
+
+if __name__ == '__main__':
+    file = '../Data/portfolio.csv'
+    port = read_csv_as_dicts(file, [str, int, float])
+    from stock import Stock
+    port2 = read_csv_as_instances(file, Stock)
+    print(port)
+    print(port2)
+    
