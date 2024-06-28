@@ -10,6 +10,17 @@ def read_csv_as_dicts(filename: str, types: list) -> list[dict]:
         records = csv_as_dicts(rows, types)
     return records
 
+
+def read_csv_as_instances(filename: str, cls: any) -> list[any]:
+    '''
+    Read CSV data into a list of instances
+    '''
+    records = []
+    with open(filename) as file:
+        rows = csv.reader(file)
+        records = csv_as_instances(rows, cls)
+    return records
+
 def csv_as_dicts(lines: list, types: list, header: list = None) -> list[dict]:
     '''
     Read lines and convert them to a list of dictionaries
@@ -24,16 +35,6 @@ def csv_as_dicts(lines: list, types: list, header: list = None) -> list[dict]:
                     for name, func, val in zip(headers, types, line)}
         dictionary_list.append(line_dict)
     return dictionary_list
-
-def read_csv_as_instances(filename: str, cls: any) -> list[any]:
-    '''
-    Read CSV data into a list of instances
-    '''
-    records = []
-    with open(filename) as file:
-        rows = csv.reader(file)
-        records = csv_as_instances(rows, cls)
-    return records
 
 def csv_as_instances(lines: list, cls: any, header: list = None) -> list[any]:
     '''
@@ -50,7 +51,14 @@ def csv_as_instances(lines: list, cls: any, header: list = None) -> list[any]:
         instances_list.append(instance)
     return instances_list
 
-if __name__ == '__main__':
+def convert_csv(lines, func, *, headers = None):
+    rows = csv.reader(lines)
+    if headers is None:
+        headers = next(lines)
+
+    return map(lambda row: func(headers, row), rows)
+    
+def test1():
     file = '../Data/portfolio.csv'
     port = read_csv_as_dicts(file, [str, int, float])
     from stock import Stock
@@ -58,3 +66,14 @@ if __name__ == '__main__':
     print(port)
     print(port2)
     
+def test2():
+    def make_dict(headers, row):
+        return dict(zip(headers, row))
+    
+    lines = open('../Data/portfolio.csv')
+    converted_csv = convert_csv(lines, make_dict())
+    for line in converted_csv:
+        print(line)
+    
+if __name__ == '__main__':
+    test2()
