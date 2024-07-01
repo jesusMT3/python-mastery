@@ -1,4 +1,6 @@
 import csv
+import logging
+log = logging.getLogger(__name__)
 
 def read_csv_as_dicts(filename: str, types: list) -> list[dict]:
     '''
@@ -30,10 +32,14 @@ def csv_as_dicts(lines: list, types: list, header: list = None) -> list[dict]:
         headers = next(lines)
     else:
         headers = header
-    for line in lines:
-        line_dict = { name: func(val) 
-                    for name, func, val in zip(headers, types, line)}
-        dictionary_list.append(line_dict)
+    for idx, line in enumerate(lines):
+        try:
+            line_dict = { name: func(val) 
+                        for name, func, val in zip(headers, types, line)}
+            dictionary_list.append(line_dict)
+        except ValueError as e:
+            log.warning(f'Row {idx}: Bad row: {line}')
+            log.debug(f'Reason: {e}')
     return dictionary_list
 
 def csv_as_instances(lines: list, cls: any, header: list = None) -> list[any]:
@@ -71,9 +77,9 @@ def test2():
         return dict(zip(headers, row))
     
     lines = open('../Data/portfolio.csv')
-    converted_csv = convert_csv(lines, make_dict())
+    converted_csv = convert_csv(lines, make_dict(headers = next(lines), row = lines))
     for line in converted_csv:
         print(line)
     
 if __name__ == '__main__':
-    test2()
+    ...
