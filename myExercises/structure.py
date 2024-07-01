@@ -1,3 +1,5 @@
+import sys
+
 class Structure:
     _fields = ()
 
@@ -6,6 +8,13 @@ class Structure:
             raise TypeError('Expected %d arguments' % len(self._fields))
         for name, arg in zip(self._fields,args):
             setattr(self, name, arg)
+            
+    @staticmethod
+    def _init():
+        locs = sys._getframe(1).f_locals
+        self = locs.pop('self')
+        for name, val in locs.items():
+            setattr(self, name, val)
             
     def __repr__(self):
         return f"{type(self.__name__)}({', '.join(repr(getattr(self, name)) for name in self._fields)})"
