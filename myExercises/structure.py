@@ -1,4 +1,4 @@
-import sys
+import sys, inspect
 
 class Structure:
     _fields = ()
@@ -15,6 +15,11 @@ class Structure:
         self = locs.pop('self')
         for name, val in locs.items():
             setattr(self, name, val)
+            
+    @classmethod
+    def set_fields(cls):
+        sig = inspect.signature(cls)
+        cls._fields = tuple(sig.parameters)
             
     def __repr__(self):
         return f"{type(self.__name__)}({', '.join(repr(getattr(self, name)) for name in self._fields)})"
